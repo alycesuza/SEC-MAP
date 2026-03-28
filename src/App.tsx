@@ -19,7 +19,10 @@ import {
   ChevronDown,
   XCircle,
   Database,
-  Info
+  Info,
+  Users,
+  Monitor,
+  RefreshCcw
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
@@ -73,6 +76,7 @@ export default function App() {
     curso: '',
     ano: '',
     campus: '',
+    pais: 'Brasil',
     tipo: 'Pública (Federal)' as 'Pública (Federal)' | 'Pública (Estadual)' | 'Pública (Municipal)' | 'Privada (Sem fins lucrativos)' | 'Privada (Com fins lucrativos)',
     nivel: 'Bacharelado' as 'Bacharelado' | 'Licenciatura' | 'Tecnólogo' | 'Especialização' | 'MBA (Master in Business Administration)' | 'Técnico Integrado' | 'Técnico Concomitante' | 'Técnico Subsequente',
     modalidade: 'Presencial' as 'EAD (Educação a Distância)' | 'Presencial' | 'Híbrido (Semipresencial)'
@@ -168,6 +172,7 @@ export default function App() {
         curso: '',
         ano: '',
         campus: '',
+        pais: 'Brasil',
         tipo: 'Pública (Federal)',
         nivel: 'Bacharelado',
         modalidade: 'Presencial'
@@ -244,7 +249,7 @@ export default function App() {
     if (results.length === 0) return;
 
     const headers = [
-      'ID', 'IES', 'Curso', 'Nível', 'Modalidade', 'Ano', 'Campus', 'Tipo', 'Score Final', 'Classificação',
+      'ID', 'IES', 'Curso', 'País', 'Nível', 'Modalidade', 'Ano', 'Campus', 'Tipo', 'Score Final', 'Classificação',
       ...DICTIONARY.map(g => g.grupo),
       'Palavras_Detectadas',
       'Data_Analise'
@@ -254,7 +259,7 @@ export default function App() {
       // Agrupa palavras únicas detectadas (não ignoradas)
       const detectedWords = Array.from(new Set(r.matches.filter(m => !m.isIgnored).map(m => m.token))).join('; ');
       return [
-        r.id, r.ies, r.curso, r.nivel, r.modalidade, r.ano, r.campus, r.tipo, r.score, r.classification,
+        r.id, r.ies, r.curso, r.pais, r.nivel, r.modalidade, r.ano, r.campus, r.tipo, r.score, r.classification,
         ...DICTIONARY.map(g => r.groupScores[g.grupo] || 0),
         detectedWords,
         new Date(r.timestamp).toISOString()
@@ -287,6 +292,7 @@ export default function App() {
       
       mdContent += `## ${idx + 1}. ${r.curso} - ${r.ies}\n\n`;
       mdContent += `**Metadados:**\n`;
+      mdContent += `- **País:** ${r.pais}\n`;
       mdContent += `- **Ano:** ${r.ano}\n`;
       mdContent += `- **Campus:** ${r.campus}\n`;
       mdContent += `- **Tipo:** ${r.tipo}\n`;
@@ -333,7 +339,8 @@ export default function App() {
       Parcial: results.filter(r => r.classification === 'Parcial').length,
       Crítico: results.filter(r => r.classification === 'Crítico').length,
     };
-    return { avg, counts };
+    const countries = new Set(results.map(r => r.pais.trim().toLowerCase())).size;
+    return { avg, counts, countries };
   }, [results]);
 
   return (
@@ -410,7 +417,7 @@ export default function App() {
               exit={{ opacity: 0, y: -10 }}
               className="space-y-8"
             >
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
                 <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl">
                   <p className="text-zinc-500 text-xs uppercase tracking-wider font-bold mb-1">Total de Cursos</p>
                   <h3 className="text-4xl font-black">{results.length}</h3>
@@ -421,7 +428,13 @@ export default function App() {
                     {stats ? stats.avg.toFixed(1) : '0.0'}
                   </h3>
                 </div>
-                <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl col-span-2 flex items-center justify-between">
+                <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl">
+                  <p className="text-zinc-500 text-xs uppercase tracking-wider font-bold mb-1">Países</p>
+                  <h3 className="text-4xl font-black text-blue-500">
+                    {stats ? stats.countries : '0'}
+                  </h3>
+                </div>
+                <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl lg:col-span-2 flex items-center justify-between">
                   <div className="space-y-1">
                     <p className="text-zinc-500 text-xs uppercase tracking-wider font-bold">Distribuição de Maturidade</p>
                     <div className="flex gap-4 mt-2">
@@ -580,16 +593,40 @@ export default function App() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-bold uppercase text-zinc-500 tracking-wider">Modalidade</label>
-                      <select 
-                        value={formData.modalidade}
-                        onChange={e => setFormData({...formData, modalidade: e.target.value as any})}
-                        className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all appearance-none"
-                      >
-                        <option value="Presencial">Presencial</option>
-                        <option value="EAD (Educação a Distância)">EAD (Educação a Distância)</option>
-                        <option value="Híbrido (Semipresencial)">Híbrido (Semipresencial)</option>
-                      </select>
+                      <label className="text-xs font-bold uppercase text-zinc-500 tracking-wider">País</label>
+                      <input 
+                        type="text" 
+                        value={formData.pais}
+                        onChange={e => setFormData({...formData, pais: e.target.value})}
+                        placeholder="Ex: Brasil"
+                        className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase text-zinc-500 tracking-wider">Modalidade</label>
+                    <div className="flex flex-wrap gap-3">
+                      {[
+                        { label: 'Presencial', value: 'Presencial', icon: Users },
+                        { label: 'EAD', value: 'EAD (Educação a Distância)', icon: Monitor },
+                        { label: 'Híbrido', value: 'Híbrido (Semipresencial)', icon: RefreshCcw }
+                      ].map(m => (
+                        <button
+                          key={m.value}
+                          type="button"
+                          onClick={() => setFormData({...formData, modalidade: m.value as any})}
+                          className={cn(
+                            "flex-1 py-3 px-2 rounded-xl border transition-all font-medium text-xs flex flex-col items-center gap-2",
+                            formData.modalidade === m.value 
+                              ? "bg-orange-600 border-orange-500 text-white" 
+                              : "bg-zinc-800 border-zinc-700 text-zinc-400 hover:border-zinc-500"
+                          )}
+                        >
+                          <m.icon size={16} />
+                          {m.label}
+                        </button>
+                      ))}
                     </div>
                   </div>
 
@@ -754,7 +791,7 @@ export default function App() {
                         </div>
                         <div>
                           <h3 className="text-xl font-bold">{res.curso}</h3>
-                          <p className="text-zinc-500 text-sm">{res.ies} • {res.nivel} • {res.modalidade} • {res.campus} • {res.ano} • {res.tipo}</p>
+                          <p className="text-zinc-500 text-sm">{res.ies} • {res.pais} • {res.nivel} • {res.modalidade} • {res.campus} • {res.ano} • {res.tipo}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-4">

@@ -118,6 +118,7 @@ export interface AnalysisResult {
   curso: string;
   ano: string;
   campus: string;
+  pais: string;
   tipo: 'Pública (Federal)' | 'Pública (Estadual)' | 'Pública (Municipal)' | 'Privada (Sem fins lucrativos)' | 'Privada (Com fins lucrativos)';
   nivel: 'Bacharelado' | 'Licenciatura' | 'Tecnólogo' | 'Especialização' | 'MBA (Master in Business Administration)' | 'Técnico Integrado' | 'Técnico Concomitante' | 'Técnico Subsequente';
   modalidade: 'EAD (Educação a Distância)' | 'Presencial' | 'Híbrido (Semipresencial)';
