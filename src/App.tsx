@@ -58,7 +58,7 @@ type Tab = 'dashboard' | 'analysis' | 'results' | 'about';
 
 export default function App() {
   // --- ESTADOS DA APLICAÇÃO ---
-  const [activeTab, setActiveTab] = useState<Tab>('dashboard'); // Aba ativa na navegação
+  const [activeTab, setActiveTab] = useState<Tab>('about'); // Aba ativa na navegação (Inicia no Sobre)
   const [results, setResults] = useState<AnalysisResult[]>([]); // Lista de todas as análises realizadas
   const [isAnalyzing, setIsAnalyzing] = useState(false);        // Status de carregamento da análise
   const [progress, setProgress] = useState(0);                   // Progresso da extração do PDF (0-100)
@@ -352,7 +352,7 @@ export default function App() {
           </div>
 
           <nav className="flex gap-1 bg-zinc-800/50 p-1 rounded-xl">
-            {(['dashboard', 'analysis', 'results', 'about'] as Tab[]).map((tab) => (
+            {(['about', 'analysis', 'results', 'dashboard'] as Tab[]).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -914,7 +914,10 @@ export default function App() {
                 <div className="absolute top-0 right-0 w-64 h-64 bg-orange-600/10 blur-3xl rounded-full -mr-32 -mt-32" />
                 
                 <div className="relative z-10 max-w-4xl">
-                  <h2 className="text-4xl font-bold mb-6 tracking-tight">Sobre o SEC-MAP</h2>
+                  <h2 className="text-4xl font-bold mb-2 tracking-tight">Sobre o SEC-MAP</h2>
+                  <p className="text-orange-500 font-medium mb-6 flex items-center gap-2">
+                    Desenvolvido por: Alyce Silva e Wanessa Borba
+                  </p>
                   <p className="text-zinc-400 text-lg leading-relaxed mb-12">
                     O SEC-MAP (Ferramenta de Mapeamento de Currículo de Educação em Segurança) é uma plataforma desenvolvida para analisar e minerar conceitos de cibersegurança em Projetos Pedagógicos de Curso (PPCs). 
                     Utilizando o framework global <strong>CSEC2017</strong> como base, a ferramenta oferece uma análise determinística e rastreável da maturidade do ensino de segurança, com suporte nativo para termos em <strong>Português e Inglês</strong>.
@@ -945,11 +948,25 @@ export default function App() {
                       </section>
                     </div>
 
-                    {/* Camada 3 */}
+                    {/* Camada de Revisão Humana */}
+                    <section className="space-y-4 bg-orange-500/5 border border-orange-500/20 rounded-2xl p-6">
+                      <h3 className="text-xl font-bold text-orange-500 flex items-center gap-2">
+                        <Search size={20} />
+                        3. O Conceito de Falso Positivo
+                      </h3>
+                      <p className="text-zinc-400 text-sm leading-relaxed">
+                        A mineração de texto automática pode identificar termos que, embora presentes no documento, não representam uma competência de segurança no contexto específico (ex: a palavra "segurança" em "segurança do trabalho"). 
+                      </p>
+                      <p className="text-zinc-400 text-sm leading-relaxed">
+                        O SEC-MAP permite que o pesquisador revise cada ocorrência na aba de <strong>Resultados</strong>. Ao marcar um termo como <strong>Falso Positivo</strong>, ele é ignorado no cálculo do IIS, garantindo que o score final reflita apenas o conteúdo pedagógico real de cibersegurança.
+                      </p>
+                    </section>
+
+                    {/* Camada 4 */}
                     <section className="space-y-4">
                       <h3 className="text-xl font-bold text-orange-500 flex items-center gap-2">
                         <BarChart3 size={20} />
-                        3. Camada de Teto Categórico (O "Filtro de Transversalidade")
+                        4. Camada de Teto Categórico (O "Filtro de Transversalidade")
                       </h3>
                       <p className="text-zinc-400 text-sm leading-relaxed">
                         Esta é a parte mais importante para a sua pesquisa. Nós dividimos o dicionário em 8 domínios. Para cada domínio <i>i</i>, calculamos a soma dos pesos dos conceitos encontrados (<i>S<sub>i</sub></i>). No entanto, aplicamos um <strong>Teto (T) de 15 pontos</strong>.
@@ -972,11 +989,11 @@ export default function App() {
                       </div>
                     </section>
 
-                    {/* Camada 4 */}
+                    {/* Camada 5 */}
                     <section className="space-y-4">
                       <h3 className="text-xl font-bold text-orange-500 flex items-center gap-2">
                         <LayoutDashboard size={20} />
-                        4. Camada de Normalização Final (O Score IIS)
+                        5. Camada de Normalização Final (O Score IIS)
                       </h3>
                       <p className="text-zinc-400 text-sm leading-relaxed">
                         O <strong>Índice de Integração de Segurança (IIS)</strong> final é a soma dos resultados dos 8 domínios, normalizada por um <strong>Score Ideal (S<sub>ideal</sub>)</strong> de 75 pontos.

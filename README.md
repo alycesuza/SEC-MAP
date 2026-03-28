@@ -18,6 +18,7 @@ Este projeto é baseado no trabalho de:
   5. Defesa Cibernética e Resposta a Incidentes
 - **Cálculo do IIS**: Geração automática de um score (0 a 15) e classificação do curso (Insuficiente, Básico, Adequado, Excelente).
 - **Rastreabilidade**: Visualização de trechos do documento onde os termos foram encontrados, com suporte para marcação de **Falsos Positivos**.
+- **Tratamento de Falsos Positivos**: O sistema permite identificar termos que aparecem no texto mas não representam competências de segurança (ex: "segurança do trabalho"). Ao marcar como falso positivo, o score é recalculado automaticamente para garantir a precisão científica.
 - **Dashboard Visual**: Gráficos de radar e barras para comparação de competências entre diferentes cursos.
 - **Exportação**: Suporte para exportação de dados em **CSV** (Planilha) e **Markdown** (Relatório).
 - **Persistência Local**: Todos os dados são salvos no navegador (LocalStorage), garantindo privacidade e acesso offline.
