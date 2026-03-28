@@ -284,7 +284,7 @@ export default function App() {
   const exportMarkdown = () => {
     if (results.length === 0) return;
 
-    let mdContent = `# Relatório de Mapeamento de Currículo (SEC-MAP)\n\n`;
+    let mdContent = `# Relatório de mapeamento de PPCs (Sec-Map)\n\n`;
     mdContent += `Data de Exportação: ${new Date().toLocaleString()}\n\n`;
 
     results.forEach((r, idx) => {
@@ -353,8 +353,8 @@ export default function App() {
               <Database className="text-white" size={24} />
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-tight">SEC-MAP</h1>
-              <p className="text-[10px] uppercase tracking-widest text-zinc-500 font-semibold">Mapeamento de Currículo</p>
+              <h1 className="text-xl font-bold tracking-tight">Sec-Map</h1>
+              <p className="text-[10px] uppercase tracking-widest text-zinc-500 font-semibold">mapeamento de PPCs</p>
             </div>
           </div>
 
@@ -951,12 +951,12 @@ export default function App() {
                 <div className="absolute top-0 right-0 w-64 h-64 bg-orange-600/10 blur-3xl rounded-full -mr-32 -mt-32" />
                 
                 <div className="relative z-10 max-w-4xl">
-                  <h2 className="text-4xl font-bold mb-2 tracking-tight">Sobre o SEC-MAP</h2>
+                  <h2 className="text-4xl font-bold mb-2 tracking-tight">Sobre o Sec-Map</h2>
                   <p className="text-orange-500 font-medium mb-6 flex items-center gap-2">
                     Desenvolvido por: Alyce Silva e Wanessa Borba
                   </p>
                   <p className="text-zinc-400 text-lg leading-relaxed mb-12">
-                    O SEC-MAP (Ferramenta de Mapeamento de Currículo de Educação em Segurança) é uma plataforma desenvolvida para analisar e minerar conceitos de cibersegurança em Projetos Pedagógicos de Curso (PPCs). 
+                    O Sec-Map (Ferramenta de mapeamento de PPCs de Educação em Segurança) é uma plataforma desenvolvida para analisar e minerar conceitos de cibersegurança em Projetos Pedagógicos de Curso (PPCs). 
                     Utilizando o framework global <strong>CSEC2017</strong> como base, a ferramenta oferece uma análise determinística e rastreável da maturidade do ensino de segurança, com suporte nativo para termos em <strong>Português e Inglês</strong>.
                   </p>
 
@@ -995,7 +995,7 @@ export default function App() {
                         A mineração de texto automática pode identificar termos que, embora presentes no documento, não representam uma competência de segurança no contexto específico (ex: a palavra "segurança" em "segurança do trabalho"). 
                       </p>
                       <p className="text-zinc-400 text-sm leading-relaxed">
-                        O SEC-MAP permite que o pesquisador revise cada ocorrência na aba de <strong>Resultados</strong>. Ao marcar um termo como <strong>Falso Positivo</strong>, ele é ignorado no cálculo do IIS, garantindo que o score final reflita apenas o conteúdo pedagógico real de cibersegurança.
+                        O Sec-Map permite que o pesquisador revise cada ocorrência na aba de <strong>Resultados</strong>. Ao marcar um termo como <strong>Falso Positivo</strong>, ele é ignorado no cálculo do IIS, garantindo que o score final reflita apenas o conteúdo pedagógico real de cibersegurança.
                       </p>
                     </section>
 
@@ -1144,7 +1144,7 @@ export default function App() {
 
       <footer className="max-w-7xl mx-auto px-4 py-12 border-t border-zinc-900 text-center">
         <p className="text-zinc-600 text-xs font-medium uppercase tracking-widest">
-          SEC-MAP © 2026 • Pesquisa Científica em Educação em Segurança
+          Sec-Map © 2026 • Pesquisa Científica em Educação em Segurança
         </p>
       </footer>
 

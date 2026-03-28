@@ -1,6 +1,6 @@
-# SEC-MAP: Mapeamento de Competências em Segurança Cibernética
+# Sec-Map: Mapeamento de Competências em Segurança Cibernética
 
-**SEC-MAP** é uma ferramenta de mineração de texto projetada para analisar Projetos Pedagógicos de Curso (PPC) e identificar a presença de competências em Segurança Cibernética, baseando-se no referencial do **Índice de Inclusão de Segurança (IIS)**.
+**Sec-Map** é uma ferramenta de mineração de texto projetada para analisar Projetos Pedagógicos de Curso (PPC) e identificar a presença de competências em Segurança Cibernética, baseando-se no referencial do **Índice de Inclusão de Segurança (IIS)**.
 
 ## 🖋️ Autoras
 Este projeto é baseado no trabalho de:
