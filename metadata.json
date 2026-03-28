@@ -1,0 +1,5 @@
+{
+  "name": "SEC-MAP: Ferramenta de Mapeamento de Currículo",
+  "description": "Ferramenta determinística para minerar e analisar conceitos de cibersegurança em Projetos Pedagógicos de Curso (PPCs) baseada no CSEC2017.",
+  "requestFramePermissions": []
+}
