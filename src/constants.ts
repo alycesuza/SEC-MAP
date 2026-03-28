@@ -99,6 +99,7 @@ export const DICTIONARY: Group[] = [
  * Interface que representa uma ocorrência encontrada no texto.
  */
 export interface Match {
+  id: string;          // ID único da ocorrência
   conceptId: string;   // ID do conceito
   conceptName: string; // Nome do conceito
   group: string;       // Grupo ao qual pertence

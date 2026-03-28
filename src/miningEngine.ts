@@ -126,6 +126,7 @@ export function mineConcepts(text: string): Match[] {
 
           // Adiciona a ocorrência à lista de resultados
           matches.push({
+            id: crypto.randomUUID(),
             conceptId: concept.id,
             conceptName: concept.nome,
             group: group.grupo,
@@ -134,10 +135,6 @@ export function mineConcepts(text: string): Match[] {
             snippet: `...${snippet.trim()}...`,
             isIgnored: false
           });
-          
-          // Para evitar poluição visual, paramos na primeira ocorrência encontrada de cada token específico.
-          // Isso garante que o usuário veja onde o termo aparece, mas sem repetir 50 vezes a mesma palavra.
-          break; 
         }
       });
     });

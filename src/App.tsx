@@ -184,13 +184,13 @@ export default function App() {
    * Alterna o status de "Ignorado" (Falso Positivo) de um termo encontrado.
    * Dispara automaticamente o recálculo do score do curso.
    */
-  const toggleIgnoreMatch = (resultId: string, conceptId: string, token: string) => {
+  const toggleIgnoreMatch = (resultId: string, matchId: string) => {
     setResults(prev => prev.map(res => {
       if (res.id !== resultId) return res;
 
-      // Inverte o status de isIgnored para o match específico
+      // Inverte o status de isIgnored para o match específico usando seu ID único
       const updatedMatches = res.matches.map(m => {
-        if (m.conceptId === conceptId && m.token === token) {
+        if (m.id === matchId) {
           return { ...m, isIgnored: !m.isIgnored };
         }
         return m;
@@ -447,7 +447,7 @@ export default function App() {
                     <div className="h-[300px]">
                       <Bar 
                         data={{
-                          labels: DICTIONARY.map(g => g.grupo.split(' ')[0]),
+                          labels: DICTIONARY.map(g => g.grupo.replace('Segurança de ', '').replace('Segurança ', '')),
                           datasets: [{
                             label: 'Média de Pontos',
                             data: DICTIONARY.map(g => {
@@ -793,7 +793,7 @@ export default function App() {
                               <div className="aspect-square bg-zinc-800/20 p-4 rounded-3xl border border-zinc-800">
                                 <Radar 
                                   data={{
-                                    labels: DICTIONARY.map(g => g.grupo.split(' ')[0]),
+                                    labels: DICTIONARY.map(g => g.grupo.replace('Segurança de ', '').replace('Segurança ', '')),
                                     datasets: [{
                                       label: 'Pontuação',
                                       data: DICTIONARY.map(g => res.groupScores[g.grupo] || 0),
@@ -821,7 +821,7 @@ export default function App() {
                               <div className="grid grid-cols-2 gap-2">
                                 {DICTIONARY.map(g => (
                                   <div key={g.grupo} className="flex justify-between text-[10px] bg-zinc-800/50 p-2 rounded-lg">
-                                    <span className="text-zinc-500 font-bold uppercase">{g.grupo.split(' ')[0]}</span>
+                                    <span className="text-zinc-500 font-bold uppercase">{g.grupo.replace('Segurança de ', '').replace('Segurança ', '')}</span>
                                     <span className="font-black text-orange-500">{res.groupScores[g.grupo] || 0}/15</span>
                                   </div>
                                 ))}
@@ -862,7 +862,7 @@ export default function App() {
                                         <p className="text-xs text-zinc-500">Termo: <span className="text-orange-400 font-mono">"{m.token}"</span></p>
                                       </div>
                                       <button 
-                                        onClick={() => toggleIgnoreMatch(res.id, m.conceptId, m.token)}
+                                        onClick={() => toggleIgnoreMatch(res.id, m.id)}
                                         className={cn(
                                           "flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all",
                                           m.isIgnored 
