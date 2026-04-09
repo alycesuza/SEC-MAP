@@ -1,0 +1,138 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: {userId}
+    // Fields:
+    //   - uid: string (required)
+    //   - email: string (required)
+    //   - displayName: string
+    //   - photoURL: string
+    //   - createdAt: timestamp
+    //
+    // Collection: mappings
+    // Document ID: {mappingId}
+    // Fields:
+    //   - id: string (required)
+    //   - userId: string (required)
+    //   - ies: string (required)
+    //   - curso: string (required)
+    //   - score: number (required)
+    //   - classification: string
+    //   - groupScores: map
+    //   - matches: list
+    //   - createdAt: timestamp
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() &&
+        (
+          (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
+          request.auth.token.email == "alycesuza@gmail.com"
+        );
+    }
+
+    function isEditor() {
+      return isAuthenticated() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'editor';
+    }
+
+    function isStaff() {
+      return isAdmin() || isEditor();
+    }
+
+    function isApproved() {
+      return isAuthenticated() && 
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isApproved == true || isStaff());
+    }
+    
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+    
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    // Domain Validators
+    
+    function isValidUser(data) {
+      let allowedFields = ['uid', 'email', 'displayName', 'photoURL', 'createdAt', 'role', 'isApproved'];
+      return hasOnlyAllowedFields(allowedFields) &&
+             data.uid is string &&
+             data.email is string &&
+             data.role in ['admin', 'editor', 'user'] &&
+             data.isApproved is bool;
+    }
+    
+    function isValidMapping(data) {
+      return hasRequiredFields(['userId', 'ies', 'curso', 'score']) &&
+             data.userId is string &&
+             data.ies is string && data.ies.size() < 500 &&
+             data.curso is string && data.curso.size() < 500 &&
+             data.score is number &&
+             data.groupScores is map &&
+             data.matches is list && data.matches.size() < 2000;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isStaff();
+      allow create: if isAuthenticated() && isOwner(userId) && isValidUser(request.resource.data) && 
+                    (
+                      (request.resource.data.role == 'user' && request.resource.data.isApproved == false) || 
+                      (request.auth.token.email == "alycesuza@gmail.com" && request.resource.data.role == 'admin' && request.resource.data.isApproved == true)
+                    );
+      allow update: if isAuthenticated() && isValidUser(request.resource.data) && 
+                    (
+                      (resource.data.email == "alycesuza@gmail.com" && request.resource.data.role == "admin" && request.resource.data.isApproved == true && (isAdmin() || isOwner(userId))) ||
+                      (resource.data.email != "alycesuza@gmail.com" && (
+                        isAdmin() || 
+                        (isEditor() && request.resource.data.isApproved == resource.data.isApproved && request.resource.data.role != 'admin') ||
+                        (isOwner(userId) && request.resource.data.role == resource.data.role && request.resource.data.isApproved == resource.data.isApproved)
+                      ))
+                    );
+    }
+
+    match /mappings/{mappingId} {
+      allow read: if true; // Public access to results
+      allow create: if isApproved() && isValidMapping(request.resource.data) && 
+                    request.resource.data.userId == request.auth.uid;
+      allow update: if isApproved() && isValidMapping(request.resource.data) && 
+                    request.resource.data.userId == resource.data.userId; // Must not change owner
+      allow delete: if isApproved() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    match /logs/{logId} {
+      allow read: if isApproved(); // Approved users can see audit logs
+      allow create: if isAuthenticated(); // Any user can create a log entry (for login/action tracking)
+      allow update, delete: if isAdmin();
+    }
+    
+    match /test/connection {
+      allow read: if true;
+    }
+  }
+}

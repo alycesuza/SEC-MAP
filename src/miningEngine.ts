@@ -40,9 +40,13 @@ export async function extractTextFromPDF(file: File, onProgress: (percent: numbe
 /**
  * Calcula o Índice de Inclusão de Segurança (IIS) baseado nos termos encontrados.
  * @param matches Lista de ocorrências encontradas no texto.
+ * @param manualAdjustments Ajustes manuais de pontuação por grupo.
  * @returns Objeto com o score final, scores por grupo e classificação.
  */
-export function calculateIIS(matches: Match[]): { score: number, groupScores: Record<string, number>, classification: AnalysisResult['classification'] } {
+export function calculateIIS(
+  matches: Match[], 
+  manualAdjustments: Record<string, number> = {}
+): { score: number, groupScores: Record<string, number>, classification: AnalysisResult['classification'] } {
   // Filtra apenas os matches que não foram marcados como Falso Positivo
   const activeMatches = matches.filter(m => !m.isIgnored);
   const groupScores: Record<string, number> = {};
@@ -66,7 +70,9 @@ export function calculateIIS(matches: Match[]): { score: number, groupScores: Re
   // Aplica o teto por grupo (Máximo de 15 pontos por categoria conforme o referencial)
   let totalSum = 0;
   Object.keys(groupScores).forEach(group => {
-    groupScores[group] = Math.min(groupScores[group], 15);
+    // Adiciona o ajuste manual antes de aplicar o teto de 15
+    const adjustedScore = groupScores[group] + (manualAdjustments[group] || 0);
+    groupScores[group] = Math.max(0, Math.min(adjustedScore, 15));
     totalSum += groupScores[group];
   });
 

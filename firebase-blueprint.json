@@ -1,0 +1,70 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Store user-specific settings and profile information.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "editor", "user"] },
+        "isApproved": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email"]
+    },
+    "Mapping": {
+      "title": "PPC Mapping Result",
+      "description": "A single curriculum mapping result for a course.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique ID for the mapping" },
+        "userId": { "type": "string", "description": "Owner of the mapping" },
+        "ies": { "type": "string" },
+        "curso": { "type": "string" },
+        "ano": { "type": "string" },
+        "pais": { "type": "string" },
+        "campus": { "type": "string" },
+        "tipo": { "type": "string" },
+        "nivel": { "type": "string" },
+        "modalidade": { "type": "string" },
+        "score": { "type": "number" },
+        "classification": { "type": "string" },
+        "groupScores": { "type": "object" },
+        "matches": { "type": "array" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "timestamp": { "type": "number" }
+      },
+      "required": ["userId", "ies", "curso", "score"]
+    },
+    "AuditLog": {
+      "title": "Audit Log",
+      "description": "Record of user actions and system events.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "action": { "type": "string" },
+        "details": { "type": "string" },
+        "timestamp": { "type": "number" }
+      },
+      "required": ["action", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile documents."
+    },
+    "/mappings/{mappingId}": {
+      "schema": "Mapping",
+      "description": "Curriculum mapping results."
+    },
+    "/logs/{logId}": {
+      "schema": "AuditLog",
+      "description": "System audit logs."
+    }
+  }
+}

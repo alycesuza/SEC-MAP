@@ -107,6 +107,7 @@ export interface Match {
   token: string;       // Termo exato encontrado
   snippet: string;     // Trecho de contexto (snippet)
   isIgnored: boolean;  // Define se é um Falso Positivo
+  reason?: string;     // Justificativa para o falso positivo
 }
 
 /**
@@ -126,5 +127,6 @@ export interface AnalysisResult {
   score: number;       // Score Final (IIS)
   classification: 'Crítico' | 'Parcial' | 'Adequado' | 'Excelente';
   groupScores: Record<string, number>; // Scores individuais por grupo
+  manualAdjustments?: Record<string, number>; // Ajustes manuais por grupo
   timestamp: number;   // Data da análise
 }
