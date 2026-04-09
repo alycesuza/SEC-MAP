@@ -90,6 +90,12 @@ ChartJS.register(
   Title
 );
 
+import { RadarChartScientific } from './components/dashboard/RadarChartScientific';
+import { CurricularHeatmap } from './components/dashboard/CurricularHeatmap';
+import { DistributionChart } from './components/dashboard/DistributionChart';
+import { MaturityStackedBar } from './components/dashboard/MaturityStackedBar';
+import { ScientificRankingTable } from './components/dashboard/ScientificRankingTable';
+
 type Tab = 'dashboard' | 'analysis' | 'results' | 'about' | 'logs' | 'users';
 
 interface AuditLogEntry {
@@ -142,6 +148,9 @@ export default function App() {
     matchId: string;
     reason: string;
   }>({ isOpen: false, resultId: '', matchId: '', reason: '' });
+
+  const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
+  const [maturityFilter, setMaturityFilter] = useState<string | null>(null);
 
   // --- ESTADOS DO FIREBASE ---
   const [user, setUser] = useState<User | null>(null);
@@ -726,11 +735,17 @@ export default function App() {
    * Filtra os resultados com base no termo de busca (IES ou Curso).
    */
   const filteredResults = useMemo(() => {
-    return results.filter(r => 
+    let filtered = results.filter(r => 
       r.ies.toLowerCase().includes(searchTerm.toLowerCase()) ||
       r.curso.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [results, searchTerm]);
+
+    if (maturityFilter) {
+      filtered = filtered.filter(r => r.classification === maturityFilter);
+    }
+
+    return filtered;
+  }, [results, searchTerm, maturityFilter]);
 
   const stats = useMemo(() => {
     if (results.length === 0) return null;
@@ -998,6 +1013,51 @@ export default function App() {
                           </div>
                         </div>
                       ))}
+                    </div>
+                  </div>
+
+                  {/* Novos Componentes Científicos */}
+                  <div className="lg:col-span-2 space-y-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                      <RadarChartScientific 
+                        results={results} 
+                        selectedResult={results.find(r => r.id === selectedCourseId) || null}
+                        isLoggedIn={!!user}
+                      />
+                      <MaturityStackedBar 
+                        results={results} 
+                        onFilter={(classification) => {
+                          setMaturityFilter(classification === maturityFilter ? null : classification);
+                          // Rolar para a tabela se necessário
+                        }}
+                        isLoggedIn={!!user}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                      <DistributionChart results={results} isLoggedIn={!!user} />
+                      <CurricularHeatmap results={results} />
+                    </div>
+
+                    <div className="space-y-4">
+                      {maturityFilter && (
+                        <div className="flex items-center justify-between bg-orange-500/10 border border-orange-500/20 p-4 rounded-2xl">
+                          <p className="text-sm text-orange-500 font-medium">
+                            Filtrando por maturidade: <span className="font-bold uppercase">{maturityFilter}</span>
+                          </p>
+                          <button 
+                            onClick={() => setMaturityFilter(null)}
+                            className="text-xs text-orange-500 hover:underline font-bold"
+                          >
+                            Limpar Filtro
+                          </button>
+                        </div>
+                      )}
+                      <ScientificRankingTable 
+                        results={filteredResults} 
+                        onSelect={setSelectedCourseId}
+                        selectedId={selectedCourseId}
+                      />
                     </div>
                   </div>
                 </div>
