@@ -1,7 +1,8 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, User } from 'firebase/auth';
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, onSnapshot, deleteDoc, updateDoc, getDocFromServer } from 'firebase/firestore';
-import firebaseConfigImport from '../firebase-applet-config.json';
+// Use import.meta.glob to optionally load the config file without breaking the build if it's missing
+const firebaseConfigImport = (import.meta.glob('../firebase-applet-config.json', { eager: true, import: 'default' })['../firebase-applet-config.json'] || {}) as any;
 
 // Use environment variables if available (for Vercel/Production), otherwise use the config file
 const firebaseConfig = {
