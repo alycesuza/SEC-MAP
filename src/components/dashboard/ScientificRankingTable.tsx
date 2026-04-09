@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
-import { ChevronUp, ChevronDown } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { ChevronUp, ChevronDown, Download, FileSpreadsheet, Image as ImageIcon } from 'lucide-react';
+import { toPng } from 'html-to-image';
+import * as XLSX from 'xlsx';
 import { AnalysisResult, DICTIONARY } from '../../constants';
 import { cn } from '../../lib/utils';
 
@@ -7,6 +9,7 @@ interface ScientificRankingTableProps {
   results: AnalysisResult[];
   onSelect: (id: string) => void;
   selectedId: string | null;
+  isLoggedIn?: boolean;
 }
 
 type SortKey = 'ies' | 'ano' | 'rawPoints' | 'score' | 'classification';
@@ -14,10 +17,45 @@ type SortKey = 'ies' | 'ano' | 'rawPoints' | 'score' | 'classification';
 export const ScientificRankingTable: React.FC<ScientificRankingTableProps> = ({ 
   results, 
   onSelect,
-  selectedId 
+  selectedId,
+  isLoggedIn
 }) => {
+  const tableRef = useRef<HTMLDivElement>(null);
   const [sortKey, setSortKey] = useState<SortKey>('score');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+
+  const exportImage = async () => {
+    if (!tableRef.current) return;
+    try {
+      const dataUrl = await toPng(tableRef.current, { backgroundColor: '#ffffff' });
+      const link = document.createElement('a');
+      link.download = `ranking-${Date.now()}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error('Erro ao exportar imagem:', err);
+    }
+  };
+
+  const exportExcel = () => {
+    const data = results.map(r => ({
+      'IES': r.ies,
+      'Curso': r.curso,
+      'Ano': r.ano,
+      'Campus': r.campus,
+      'Tipo': r.tipo,
+      'Nível': r.nivel,
+      'Modalidade': r.modalidade,
+      'Pontos Brutos': Object.values(r.groupScores).reduce((sum, val) => (sum as number) + (val as number), 0),
+      'Índice IIS': r.score,
+      'Classificação': r.classification
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Ranking");
+    XLSX.writeFile(wb, `ranking-${Date.now()}.xlsx`);
+  };
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -49,8 +87,30 @@ export const ScientificRankingTable: React.FC<ScientificRankingTableProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-zinc-950 p-8 rounded-3xl shadow-sm overflow-x-auto">
-      <h4 className="text-lg font-bold mb-6">Ranking de Instituições (Padrão Científico)</h4>
+    <div ref={tableRef} className="bg-white dark:bg-zinc-950 p-8 rounded-3xl shadow-sm overflow-x-auto group relative">
+      <div className="flex justify-between items-center mb-6">
+        <h4 className="text-lg font-bold">Ranking de instituições</h4>
+        {isLoggedIn && (
+          <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button 
+              onClick={exportImage}
+              className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-zinc-500 flex items-center gap-1"
+              title="Exportar PNG"
+            >
+              <ImageIcon size={16} />
+              <span className="text-[10px]">PNG</span>
+            </button>
+            <button 
+              onClick={exportExcel}
+              className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-zinc-500 flex items-center gap-1"
+              title="Exportar Excel"
+            >
+              <FileSpreadsheet size={16} />
+              <span className="text-[10px]">XLSX</span>
+            </button>
+          </div>
+        )}
+      </div>
       <table className="w-full text-sm border-t border-b border-zinc-900 dark:border-zinc-100">
         <thead>
           <tr className="border-b border-zinc-300 dark:border-zinc-700">

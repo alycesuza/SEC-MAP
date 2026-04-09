@@ -62,7 +62,7 @@ export const MaturityStackedBar: React.FC<MaturityStackedBarProps> = ({ results,
   return (
     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-8 rounded-3xl shadow-sm relative group">
       <div className="flex justify-between items-center mb-6">
-        <h4 className="text-lg font-bold">Análise de Maturidade (100% Stacked)</h4>
+        <h4 className="text-lg font-bold">Análise de maturidade</h4>
         {isLoggedIn && (
           <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <button onClick={() => exportChart('png')} className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-zinc-500">
@@ -73,7 +73,7 @@ export const MaturityStackedBar: React.FC<MaturityStackedBarProps> = ({ results,
         )}
       </div>
       <div ref={chartRef} className="h-[350px] w-full">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
           <BarChart
             data={data}
             layout="vertical"

@@ -198,7 +198,7 @@ export const DistributionChart: React.FC<DistributionChartProps> = ({ results, i
   return (
     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-8 rounded-3xl shadow-sm relative group">
       <div className="flex justify-between items-center mb-6">
-        <h4 className="text-lg font-bold">Distribuição Estatística (IIS)</h4>
+        <h4 className="text-lg font-bold">Distribuição estatística (IIS)</h4>
         {isLoggedIn && (
           <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <button onClick={() => exportChart('png')} className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-zinc-500">

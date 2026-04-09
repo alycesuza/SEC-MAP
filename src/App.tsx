@@ -961,7 +961,7 @@ export default function App() {
                   <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-8 rounded-3xl shadow-sm">
                     <h4 className="text-lg font-bold mb-6 flex items-center gap-2">
                       <BarChart3 size={20} className="text-orange-500" />
-                      Média por Domínio CSEC2017
+                      Média por domínio
                     </h4>
                     <div className="h-[300px]">
                       <Bar 
@@ -995,7 +995,7 @@ export default function App() {
                   <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-8 rounded-3xl shadow-sm">
                     <h4 className="text-lg font-bold mb-6 flex items-center gap-2">
                       <LayoutDashboard size={20} className="text-orange-500" />
-                      Top 5 Cursos (IIS)
+                      Top 5 cursos (IIS)
                     </h4>
                     <div className="space-y-4">
                       {([...results].sort((a, b) => b.score - a.score).slice(0, 5)).map((r, idx) => (
@@ -1036,7 +1036,7 @@ export default function App() {
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                       <DistributionChart results={results} isLoggedIn={!!user} />
-                      <CurricularHeatmap results={results} />
+                      <CurricularHeatmap results={results} isLoggedIn={!!user} />
                     </div>
 
                     <div className="space-y-4">
@@ -1057,6 +1057,7 @@ export default function App() {
                         results={filteredResults} 
                         onSelect={setSelectedCourseId}
                         selectedId={selectedCourseId}
+                        isLoggedIn={!!user}
                       />
                     </div>
                   </div>
@@ -1357,13 +1358,15 @@ export default function App() {
                           )}>{res.classification}</p>
                         </div>
                         <div className="flex items-center gap-2">
-                          <button 
-                            onClick={(e) => { e.stopPropagation(); setEditModal({ isOpen: true, result: res }); }}
-                            className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-all"
-                            title="Editar Metadados"
-                          >
-                            <Edit size={16} />
-                          </button>
+                          {user && (user.uid === res.userId || userProfile?.role === 'admin' || user.email === 'alycesuza@gmail.com') && (
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); setEditModal({ isOpen: true, result: res }); }}
+                              className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-all"
+                              title="Editar Metadados"
+                            >
+                              <Edit size={16} />
+                            </button>
+                          )}
                           {user && (userProfile?.isApproved || user.email === 'alycesuza@gmail.com') && (user.uid === res.userId || userProfile?.role === 'admin' || user.email === 'alycesuza@gmail.com') && (
                             <button 
                               onClick={(e) => { e.stopPropagation(); deleteResult(res.id); }}
@@ -1434,7 +1437,11 @@ export default function App() {
                                         type="number"
                                         value={res.manualAdjustments?.[g.grupo] || 0}
                                         onChange={(e) => updateManualAdjustment(res.id, g.grupo, parseInt(e.target.value) || 0)}
-                                        className="w-12 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded px-1 py-0.5 text-[10px] focus:outline-none focus:border-orange-500/50"
+                                        disabled={!user || (user.uid !== res.userId && userProfile?.role !== 'admin' && user.email !== 'alycesuza@gmail.com')}
+                                        className={cn(
+                                          "w-12 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded px-1 py-0.5 text-[10px] focus:outline-none focus:border-orange-500/50",
+                                          (!user || (user.uid !== res.userId && userProfile?.role !== 'admin' && user.email !== 'alycesuza@gmail.com')) && "opacity-50 cursor-not-allowed"
+                                        )}
                                       />
                                     </div>
                                   </div>
@@ -1451,7 +1458,7 @@ export default function App() {
                                 </span>
                               </div>
                               
-                              <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                              <div className="space-y-3 max-h-[800px] overflow-y-auto pr-2 custom-scrollbar">
                                 {res.matches.map((m, idx) => (
                                   <div 
                                     key={`${m.conceptId}-${idx}`} 
@@ -1747,7 +1754,7 @@ export default function App() {
                       <section className="space-y-3">
                         <h3 className="text-xl font-bold text-orange-500 flex items-center gap-2">
                           <CheckCircle2 size={20} />
-                          1. Detecção Binária Bilíngue
+                          1. Detecção binária bilíngue
                         </h3>
                         <p className="text-zinc-600 dark:text-zinc-400 text-sm leading-relaxed">
                           Evitamos punir ementas curtas ou premiar ementas prolixas. O sistema não conta a frequência, mas sim a <strong>presença</strong> do conceito. 
@@ -1758,7 +1765,7 @@ export default function App() {
                       <section className="space-y-3">
                         <h3 className="text-xl font-bold text-orange-500 flex items-center gap-2">
                           <Database size={20} />
-                          2. Ponderação por Custo (w)
+                          2. Ponderação por custo (w)
                         </h3>
                         <p className="text-zinc-600 dark:text-zinc-400 text-sm leading-relaxed">
                           Cada conceito tem um peso <strong>w (1 a 5)</strong> baseado no "Custo de Inclusão Curricular". 
@@ -1771,7 +1778,7 @@ export default function App() {
                     <section className="space-y-4 bg-orange-500/5 border border-orange-500/20 rounded-2xl p-6">
                       <h3 className="text-xl font-bold text-orange-500 flex items-center gap-2">
                         <Search size={20} />
-                        3. O Conceito de Falso Positivo
+                        3. O conceito de falso positivo
                       </h3>
                       <p className="text-zinc-600 dark:text-zinc-400 text-sm leading-relaxed">
                         A mineração de texto automática pode identificar termos que, embora presentes no documento, não representam uma competência de segurança no contexto específico (ex: a palavra "segurança" em "segurança do trabalho"). 
@@ -1785,7 +1792,7 @@ export default function App() {
                     <section className="space-y-4">
                       <h3 className="text-xl font-bold text-orange-500 flex items-center gap-2">
                         <BarChart3 size={20} />
-                        4. Camada de Teto Categórico (O "Filtro de Transversalidade")
+                        4. Camada de teto categórico
                       </h3>
                       <p className="text-zinc-600 dark:text-zinc-400 text-sm leading-relaxed">
                         Esta é a parte mais importante para a sua pesquisa. Nós dividimos o dicionário em 8 domínios. Para cada domínio <i>i</i>, calculamos a soma dos pesos dos conceitos encontrados (<i>S<sub>i</sub></i>). No entanto, aplicamos um <strong>Teto (T) de 15 pontos</strong>.
@@ -1812,7 +1819,7 @@ export default function App() {
                     <section className="space-y-4">
                       <h3 className="text-xl font-bold text-orange-500 flex items-center gap-2">
                         <LayoutDashboard size={20} />
-                        5. Camada de Normalização Final (O Score IIS)
+                        5. Camada de normalização final (O score IIS)
                       </h3>
                       <p className="text-zinc-400 text-sm leading-relaxed">
                         O <strong>Índice de Integração de Segurança (IIS)</strong> final é a soma dos resultados dos 8 domínios, normalizada por um <strong>Score Ideal (S<sub>ideal</sub>)</strong> de 75 pontos.
@@ -1843,7 +1850,7 @@ export default function App() {
                   <div className="mt-16 bg-zinc-50 dark:bg-zinc-800/30 border border-zinc-100 dark:border-zinc-800 rounded-2xl p-6">
                     <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
                       <AlertCircle size={20} className="text-orange-500" />
-                      Classificação por Maturidade
+                      Classificação por maturidade
                     </h3>
                     <div className="overflow-x-auto">
                       <table className="w-full text-left text-sm">
@@ -1884,7 +1891,7 @@ export default function App() {
 
               <div className="space-y-6">
                 <div className="flex items-center justify-between px-4">
-                  <h2 className="text-2xl font-bold">Dicionário de Conceitos (PT/EN)</h2>
+                  <h2 className="text-2xl font-bold">Dicionário de conceitos</h2>
                   <span className="text-xs bg-zinc-800 text-zinc-400 px-3 py-1 rounded-full border border-zinc-700">Base CSEC2017</span>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

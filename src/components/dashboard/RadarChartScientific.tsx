@@ -78,7 +78,7 @@ export const RadarChartScientific: React.FC<RadarChartScientificProps> = ({
       <div className="flex justify-between items-center mb-6">
         <h4 className="text-lg font-bold flex items-center gap-2">
           <Radar size={20} className="text-orange-500" />
-          Raio-X de Domínios (CSEC2017)
+          Raio-X de domínios
         </h4>
         {isLoggedIn && (
           <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -103,7 +103,7 @@ export const RadarChartScientific: React.FC<RadarChartScientificProps> = ({
       </div>
 
       <div ref={chartRef} className="h-[400px] w-full">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
           <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data}>
             <PolarGrid stroke="#3f3f46" />
             <PolarAngleAxis dataKey="subject" tick={{ fill: '#71717a', fontSize: 10 }} />
